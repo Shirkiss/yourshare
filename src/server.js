@@ -18,5 +18,8 @@ app.use(bodyParser.json());
 app.use('/api/users', users);
 app.use('/api/articles', articles);
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname + '/build/index.html'));
+});
 
 app.listen(8000, () => console.log('Listening on port 8000'));
