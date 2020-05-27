@@ -1,4 +1,8 @@
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const bcrypt = require('bcrypt');
 const { User, validate } = require('../modules/user');
+const _ = require('lodash');
 const express = require('express');
 const router = express.Router();
 
@@ -15,29 +19,12 @@ router.post('/register', async (req, res) => {
         return res.status(400).send({message: 'That user already exists!'});
     } else {
         // Insert the new user if they do not exist yet
-        user = new User({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password
-        });
+        user = new User(_.pick(req.body, ['name', 'email', 'password']));
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
         await user.save();
-        res.send(user);
-    }
-});
-
-router.post('/login', async (req, res) => {
-    const {email, password} = req.body;
-
-    // Check if this user already exists
-    let user = await User.findOne({ email: email });
-    if (user) {
-        if (user.password === password) {
-            res.status(200).json(user);
-        } else {
-            res.status(500).json({message: 'Invalid password'});
-        }
-    } else {
-        res.status(500).json({message: 'Invalid user'});
+        const token = jwt.sign({ _id: user._id }, config.get('PrivateKey'));
+        res.header('x-auth-token', token).send(_.pick(user, ['_id', 'name', 'email']));
     }
 });
 
