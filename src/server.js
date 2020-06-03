@@ -1,9 +1,9 @@
 import express from 'express';
+import bodyParser from 'body-parser';
+import path from 'path';
 const config = require('config');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
-import bodyParser from 'body-parser';
-import path from 'path';
 const mongoose = require('mongoose');
 const users = require('./routes/users');
 const articles = require('./routes/articles');
