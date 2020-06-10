@@ -6,6 +6,7 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const mongoose = require('mongoose');
 const articles = require('./routes/articles');
+const followers = require('./routes/followers');
 
 const app = express();
 
@@ -21,6 +22,7 @@ if (!config.get('PrivateKey')) {
 app.use(express.static(path.join(__dirname, '/build')));
 app.use(bodyParser.json());
 app.use('/api/articles', articles);
+app.use('/api/users', followers);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname + '/build/index.html'));
